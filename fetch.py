@@ -1,7 +1,9 @@
 import sys
+
 reload(sys)
 sys.setdefaultencoding("utf-8")
 import codecs
+
 sys.stdout = codecs.getwriter('utf8')(sys.stdout)
 
 from gooey import Gooey, GooeyParser
@@ -16,6 +18,7 @@ def onRequestError(request):
     print(request.headers)
     print(request.text)
     sys.exit(2)
+
 
 @Gooey
 def main():
@@ -45,33 +48,37 @@ oldestId" to continue fetching the past).]
    Messages newer than it will be retrieved and added at the bottom
    of the file, in order.
     """
-    parser = GooeyParser(description="Convert your to-be-analyzed grext into a JSON file!") 
+    parser = GooeyParser(description="Convert your to-be-analyzed grext into a JSON file!")
 
-	
     parser.add_argument('--AccessToken',
-                            help='Enter your ACCESS TOKEN!')
+                        help='Enter your ACCESS TOKEN!')
     parser.add_argument('--idNumber',
-                            help='Enter your group ID! To obtain your IDs enter \'help\'')
-	
+                        help='Enter your group ID! To obtain your IDs enter \'help\'')
+
     args = parser.parse_args()
     idNumber = args.idNumber
-    #print idNumber
+    # print idNumber
     accessToken = args.AccessToken
-    #print accessToken
-	
-    #if len(sys.argv) is not 2 and len(sys.argv) is not 4:
-        #print(main.__doc__)
-        #print("ending")
-        #sys.exit(1)
-       
+
+    #enter your own personalized GroupMe token for quicker usage
+    MY_TOKEN = 'ENTER YOUR OWN TOKEN HERE'
+    if accessToken == "me":
+        print('Hello')
+        accessToken = MY_TOKEN
+    # print accessToken
+
+    # if len(sys.argv) is not 2 and len(sys.argv) is not 4:
+    # print(main.__doc__)
+    # print("ending")
+    # sys.exit(1)
 
     beforeId = None
     stopId = None
 
-#Ignored because length can only be 2 or 4 now
-    
+    # Ignored because length can only be 2 or 4 now
+
     group = idNumber
-    #accessToken = sys.argv[2]
+    # accessToken = sys.argv[2]
 
     complete = False
     pageCount = 0
@@ -88,29 +95,30 @@ oldestId" to continue fetching the past).]
         'X-Access-Token': accessToken
     }
     names = {}
-#Naming the file with Group Name & Date Stamp:   
+    # Naming the file with Group Name & Date Stamp:
     url = 'https://api.groupme.com/v3/groups?token=' + accessToken
-    #print url
+    # print url
     ids = {}
-	#params = {}
+    # params = {}
     idJSon = requests.get(url)
     binary = idJSon.content
     output = json.loads(binary)
     for item in output['response']:
         names[item['id']] = item['name'];
-    if idNumber == ("help"):       #Gives the user a list of all my IDs
+    if idNumber == ("help"):  # Gives the user a list of all my IDs
         for item in output['response']:
-    	    print item['name']
-    	    print item['id']
-    	sys.exit(0)
+            print item['name']
+            print item['id']
+            print
+        sys.exit(0)
     else:
         groupname = names[idNumber]
-        #print groupname
-        
-    transcriptFileName = groupname +time.strftime(" %m-%d-%Y")+ '.json'
-    #print transcriptFileName + '          '
-    
-    #sys.exit(0)
+        # print groupname
+
+    transcriptFileName = groupname + time.strftime(" %m-%d-%Y") + '.json'
+    # print transcriptFileName + '          '
+
+    # sys.exit(0)
     try:
         transcriptFile = open(transcriptFileName)
         transcript = json.load(transcriptFile)
@@ -161,9 +169,9 @@ oldestId" to continue fetching the past).]
 
     transcriptFile = open(transcriptFileName, 'w+')
     json.dump(transcript, transcriptFile, ensure_ascii=False)
-    print "\nCompleted:\n"+transcriptFileName
+    print "\nCompleted:\n" + transcriptFileName
     transcriptFile.close()
-   
+
 
 if __name__ == '__main__':
     main()
